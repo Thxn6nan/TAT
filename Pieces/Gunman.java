@@ -8,7 +8,7 @@ import javax.imageio.ImageIO;
 
 class Gunman extends Pieces {
     public Gunman(Board board, int col, int row, boolean isFirst) {
-        super(board, 1, 1);
+        super(board, 2, 1, isFirst);
         this.col = col;
         this.row = row;
         this.coordinate_x = col * board.tileSize;
@@ -38,7 +38,7 @@ class Gunman extends Pieces {
     // คำนวณระยะโจมตีได้
     public ArrayList<Point> getAttackTiles() {
         ArrayList<Point> tiles = new ArrayList<>();
-        int maxRange = Math.min(2 + 0 + (board.isPieceOnExtraRange(this) ? 2 : 0), 4); // ระยะเริ่มต้น + ระยะที่เพิ่ม (ระยะสูงสุดคือ 4)
+        int maxRange = Math.min(2 + addPieceRange() + (board.isPieceOnExtraRange(this) ? 2 : 0), 4); // ระยะเริ่มต้น + ระยะที่เพิ่ม (ระยะสูงสุดคือ 4)
 
         // ตรวจสอบแนวเฉียง
         int[][] diagonalDirections = {

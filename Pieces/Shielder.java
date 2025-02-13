@@ -12,7 +12,7 @@ class Shielder extends Pieces {
     private boolean invulnerable = true;
 
     public Shielder(Board board, int col, int row, boolean isFirst) {
-        super(board, 2, 1);
+        super(board, 1, 1, isFirst);
         this.col = col;
         this.row = row;
         this.coordinate_x = col * board.tileSize;

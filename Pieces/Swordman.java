@@ -10,7 +10,7 @@ import javax.imageio.ImageIO;
 // รอปรับแก้ไข และเรียกใช้
 class Swordsman extends Pieces {
     public Swordsman(Board board, int col, int row, boolean isFirst) {
-        super(board, 2, 1); // board, sumCost, attackRange
+        super(board, 2, 1, isFirst); // board, sumCost, attackRange
         this.col = col;
         this.row = row;
         this.coordinate_x = col * board.tileSize;
@@ -40,7 +40,7 @@ class Swordsman extends Pieces {
     // คำนวณระยะโจมตีได้
     public ArrayList<Point> getAttackTiles() {
         ArrayList<Point> tiles = new ArrayList<>();
-        int maxRange = Math.min(2 + 0/* + addRange()*/ + (board.isPieceOnExtraRange(this) ? 2 : 0), 4); // ระยะเริ่มต้น + ระยะที่เพิ่ม (ระยะสูงสุดคือ 4)
+        int maxRange = Math.min(2 + addPieceRange() + (board.isPieceOnExtraRange(this) ? 2 : 0), 4); // ระยะเริ่มต้น + ระยะที่เพิ่ม (ระยะสูงสุดคือ 4)
 
         // ตรวจสอบแนวตั้ง (ขึ้นและลง)
         for (int i = 1; i <= maxRange; i++) {

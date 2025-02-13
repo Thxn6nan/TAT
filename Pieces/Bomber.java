@@ -8,7 +8,7 @@ import javax.imageio.ImageIO;
 
 class Bomber extends Pieces {
     public Bomber(Board board, int col, int row, boolean isFirst) {
-        super(board, 1, 1);
+        super(board, 6, 1, isFirst);
         this.col = col;
         this.row = row;
         this.coordinate_x = col * board.tileSize;

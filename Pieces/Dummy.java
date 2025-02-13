@@ -8,7 +8,7 @@ import javax.imageio.ImageIO;
 
 class Dummy extends Pieces {
     public Dummy(Board board, int col, int row, boolean isFirst) {
-        super(board, 1, 1);
+        super(board, 0, 1, isFirst);
         this.col = col;
         this.row = row;
         this.coordinate_x = col * board.tileSize;
