@@ -18,20 +18,21 @@ public class Pieces {
     protected int attackRange;
     protected int sumCost;
     protected int attackRangeCost;
-    protected int addRange;
+    protected int addRange = 1;
     
     protected Board board;
     protected BoardEvent event;
     BufferedImage sheet;
     BufferedImage sprite;
 
-    public Pieces(Board board, int sumCost, int attackRange) { 
+    public Pieces(Board board, int sumCost, int attackRange, boolean isFirst) { 
         this.board = board;
         this.sumCost = sumCost;
         this.attackRange = attackRange;
+        this.isFirst = isFirst;
 
         try {
-            sheet = ImageIO.read(getClass().getResource("/tat/pawn.png"));
+            sheet = ImageIO.read(getClass().getResource((isFirst == true) ? "/res/pawn.png" : "/res/pawn2.png")); // แสดงตัวหมากแต่ละฝั่ง
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -60,6 +61,10 @@ public class Pieces {
 
     public int getRangeCost() {
         return attackRangeCost;
+    }
+
+    public int addPieceRange(){
+        return addRange;
     }
 
     public ArrayList<int[]> getAttackRange() {

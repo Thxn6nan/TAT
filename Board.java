@@ -28,7 +28,7 @@ final class Board extends JPanel {
     
     public Board(int par, int par1, boolean par2) {
         this.setPreferredSize(new Dimension(col * tileSize, row * tileSize));
-        this.selectedPieces = new Pieces(this, 0, 0); // กำหนด selectedPieces ก่อนที่จะใช้
+        this.selectedPieces = new Pieces(this, 0, 0, true); // กำหนด selectedPieces ก่อนที่จะใช้
         this.event = new BoardEvent(this, 0, 0); // สร้าง event และเรียก sumEvent
         if (event != null) {
             event.sumEvent(getPieceCol(), getPieceRow());
@@ -208,8 +208,10 @@ final class Board extends JPanel {
                     }
                 }
                     
-            } repaint();
-            //eventList.remove(new Barrier(this, 4, 4));
+            }
+            repaint();
+             // ลบอีเวนต์เพิ่มระยะของหมากหลังโจมตีแล้ว
+            if(isPieceOnExtraRange(selectedPieces)) removeEventAt(selectedPieces.col, selectedPieces.row);
         }
     
         // ลบหมากที่อยู่ในทิศที่เลือก
