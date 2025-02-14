@@ -8,8 +8,8 @@ import javax.swing.*;
 public class TAT {
 
     public static void main(String[] args) {
-        boolean DEBUG = true; // Debug mode
-        //Scanner input = new Scanner(System.in);
+        boolean DEBUG = false; // Debug mode
+        Scanner input = new Scanner(System.in);
 
         // player system
         Player player_1 = new Player(1, 10);
@@ -22,25 +22,18 @@ public class TAT {
         frame.setMinimumSize(new Dimension(1000, 1000));
         frame.setLocationRelativeTo(null);
 
-        TAT tatInstance = new TAT();
+        //TAT tatInstance = new TAT();
         Board board = new Board(0, 0, true);
         frame.add(board);
-
+        System.out.print("Add your pieces: ");
+        board.addPiece("dummy", 6, 3, true);
+        //board.addPiece(input.nextLine(), input.nextInt(), input.nextInt(), input.nextBoolean());
         frame.setVisible(true);
 
         if(DEBUG == true){
             System.out.printf("id: %d mp: %d\n", player_1.getID(), player_1.getMP());
             System.out.printf("id: %d mp: %d\n", player_2.getID(), player_2.getMP());
         }
+        input.close();
     }
-    
-    /*
-    public static time(){
-
-    }
-
-    public static turn(){
-        
-    }
-*/
 }

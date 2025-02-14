@@ -4,8 +4,6 @@ import java.util.Random;
 import java.util.HashSet;
 import java.util.Set;
 import java.awt.*;
-import javax.swing.*;
-
 
 public class BoardEvent {
     public int col, row;
@@ -14,6 +12,7 @@ public class BoardEvent {
     protected Board board;
 
     private static final Random random = new Random();
+    Pieces pieces;
 
     // ตัวแปรเก็บตำแหน่งของอีเวนต์ที่เกิดขึ้น
     private final Set<Point> eventPositions = new HashSet<>();
@@ -33,34 +32,40 @@ public class BoardEvent {
         this.turn = turn;
     }
 
-    public void sumEvent(int piece_col, int piece_row) {
+    public void sumEvent() {
         if (turn > 4 && turn % 4 != 0) {
+            System.out.println("turn: " + turn);
             int c = random.nextInt(9);
             int r = random.nextInt(8);
 
+            Pieces piecesInfo = board.getPieces(c, r);
+            System.out.println(piecesInfo);
+
             // ถ้าทับตัวหมากหรืออีเวนต์ที่มีอยู่แล้ว สุ่มใหม่
-            while (c == piece_col && r == piece_row || eventPositions.contains(new Point(c, r))) {
+            while (c == piecesInfo.col && r == piecesInfo.row || eventPositions.contains(new Point(c, r))) {
                 c = random.nextInt(9);
                 r = random.nextInt(8);
             }
             // สุ่ม wall อีเวนต์ 1 อัน
             board.spawnEvent("wall", c, r);
+            System.out.println("spawnEvent called. Type: 2" + " at " + c + ", " + r);
             eventPositions.add(new Point(c, r));
 
             // สุ่มอีเวนต์เพิ่ม 3 อัน
-            for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
                 int eventType = random.nextInt(3); // 3 ประเภท
                 c = random.nextInt(9);
                 r = random.nextInt(8);
 
                 // ถ้าทับตัวหมากหรืออีเวนต์ที่มีอยู่แล้ว สุ่มใหม่
-                while (c == piece_col && r == piece_row || eventPositions.contains(new Point(c, r))) {
+                while (c == piecesInfo.col && r == piecesInfo.row || eventPositions.contains(new Point(c, r))) {
                     c = random.nextInt(9);
                     r = random.nextInt(8);
                 }
                 getEvent(eventType, c, r);
                 eventPositions.add(new Point(c, r)); // เพิ่มตำแหน่งอีเวนต์ที่สุ่มใหม่
             }
+             
         } else if (turn % 4 == 0) {
             board.removeAllEvent();
             eventPositions.clear();
@@ -74,6 +79,7 @@ public class BoardEvent {
             case 2 -> board.spawnEvent("wall", c, r);
             default -> {}
         }
+        System.out.println("spawnEvent called. Type: " + eventType + " at " + c + ", " + r);
     }
 
     public boolean isBlockOath() {

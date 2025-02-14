@@ -1,20 +1,17 @@
 package tat;
 
-import java.util.HashMap;
-import java.util.Map;
+// ใช้เป็น * อย่างเดียวทุกอันก็ไม่ได้ด้วยนะ บางอันเอ๋ออีก
+import java.util.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.util.ArrayList;
-import java.util.Iterator;
-
 
 final class Board extends JPanel {
     int tileSize = 85; // ขนาดช่อง
     private final int col = 9; // แนวนอน x
     private final int row = 8; // แนวตั้ง y
-    private boolean isFirst;
+    //private boolean isFirst;
     private final BoardEvent event;
     
     ArrayList<Pieces> piecesList = new ArrayList<>(); // เก็บข้อมูลตัวหมาก
@@ -28,12 +25,15 @@ final class Board extends JPanel {
     
     public Board(int par, int par1, boolean par2) {
         this.setPreferredSize(new Dimension(col * tileSize, row * tileSize));
-        this.selectedPieces = new Pieces(this, 0, 0, true); // กำหนด selectedPieces ก่อนที่จะใช้
+        this.selectedPieces = new Pieces(this, 0, 0, 0, 0, true); // กำหนด selectedPieces ก่อนที่จะใช้
         this.event = new BoardEvent(this, 0, 0); // สร้าง event และเรียก sumEvent
+        
+        //System.out.println(piecesList.size());
+
         if (event != null) {
-            event.sumEvent(getPieceCol(), getPieceRow());
+            event.sumEvent();
         }
-        addPiece(); // เพิ่มหมาก
+        //addPiece(); // main
         addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent e) {
@@ -170,8 +170,8 @@ final class Board extends JPanel {
     private void handleAttack(int clickedCol, int clickedRow) {
         ArrayList<Pieces> toRemovePieces = new ArrayList<>();
         ArrayList<BoardEvent> toRemoveEvents = new ArrayList<>();
-        Iterator<Pieces> iterator = toRemovePieces.iterator();
         
+        // อยู่ในรัศมีไหม ฝั่งเดียวกันไหม มีหมากอื่นบังไหม  เป็นคลาสโล่ไหม มีบาเรียไหม 
         for (Point p : highlightedTiles) {
             Pieces targetPiece = getPieces(p.x, p.y);
             if (targetPiece == null) continue; // ข้ามถ้าไม่มีหมาก
@@ -186,34 +186,45 @@ final class Board extends JPanel {
                 (hoveredDirection.equals("DOWN-LEFT") && p.x < selectedPieces.col && p.y > selectedPieces.row) ||
                 (hoveredDirection.equals("DOWN-RIGHT") && p.x > selectedPieces.col && p.y > selectedPieces.row) ||
                 (hoveredDirection.equals("AoE"))) {
-                    
+
+                // ตรวจสอบว่ามีหมากบังระหว่างการโจมตี
+                if (isBlocking(selectedPieces, targetPiece, hoveredDirection) && !"AoE".equals(hoveredDirection)) {
+                    System.out.println("All enemy in range have protecter");
+                    continue;  // ข้ามถ้าหมากถูกบัง
+                }
+
                 // ตรวจสอบว่าหมากที่ถูกลบเป็นพันธมิตรหรือไม่
                 if (targetPiece.isFirst == selectedPieces.isFirst) {
                     continue; // ข้ามการลบหมากนี้
                 } else if (targetPiece instanceof Shielder shielder) {
                     if (shielder.isInvulnerable()) {
                         shielder.setInvulnerable(false);
+                        System.out.println("Enemy's shielder is blocking");
                     } else if (isPieceOnBarrier(targetPiece) || targetPiece.isInvul()) {
                         targetPiece.setInvul(false);
                         removeEventAt(targetPiece.col, targetPiece.row);
+                        System.out.println("Enemy's barrier has blocked");
                     } else {
                         toRemovePieces.add(targetPiece); // ลบตัวหมากทันทีถ้าไม่มี Invul
+                        System.out.println("Nearest enemy is dead");
                     }
                 } else {
                     if (isPieceOnBarrier(targetPiece) || targetPiece.isInvul()) {
                         targetPiece.setInvul(false);
                         removeEventAt(targetPiece.col, targetPiece.row);
+                        System.out.println("Enemy's barrier has blocked");
                     } else {
                         toRemovePieces.add(targetPiece); // ลบตัวหมากถ้าไม่มี Invul
+                        System.out.println("Nearest enemy is dead");
                     }
                 }
-                    
             }
             repaint();
-             // ลบอีเวนต์เพิ่มระยะของหมากหลังโจมตีแล้ว
-            if(isPieceOnExtraRange(selectedPieces)) removeEventAt(selectedPieces.col, selectedPieces.row);
+            System.out.println("==================");
+            // ลบอีเวนต์เพิ่มระยะของหมากหลังโจมตีแล้ว
+            if (isPieceOnExtraRange(selectedPieces)) removeEventAt(selectedPieces.col, selectedPieces.row);
         }
-    
+
         // ลบหมากที่อยู่ในทิศที่เลือก
         piecesList.removeAll(toRemovePieces);
 
@@ -225,8 +236,61 @@ final class Board extends JPanel {
         highlightedTiles.clear(); // เคลียร์แสดงรัศมีโจมตี
         repaint();
     }
-    
-    
+
+    private boolean isBlocking(Pieces attacker, Pieces target, String direction) {
+        int startX = attacker.col;
+        int startY = attacker.row;
+        int endX = target.col;
+        int endY = target.row;
+
+        // เช็คทิศทางที่กำหนด
+        switch (direction) {
+            case "UP":
+                for (int y = startY - 1; y > endY; y--) {
+                    Pieces blocker = getPieces(startX, y);
+                    if (blocker != null) {
+                        if (blocker.isFirst != attacker.isFirst) {
+                            return true; // ข้ามถ้าหมากศัตรูบัง
+                        }
+                    }
+                }
+                break;
+            case "DOWN":
+                for (int y = startY + 1; y < endY; y++) {
+                    Pieces blocker = getPieces(startX, y);
+                    if (blocker != null) {
+                        if (blocker.isFirst != attacker.isFirst) {
+                            return true; // ข้ามถ้าหมากศัตรูบัง
+                        }
+                    }
+                }
+                break;
+            case "LEFT":
+                for (int x = startX - 1; x > endX; x--) {
+                    Pieces blocker = getPieces(x, startY);
+                    if (blocker != null) {
+                        if (blocker.isFirst != attacker.isFirst) {
+                            return true; // ข้ามถ้าหมากศัตรูบัง
+                        }
+                    }
+                }
+                break;
+            case "RIGHT":
+                for (int x = startX + 1; x < endX; x++) {
+                    Pieces blocker = getPieces(x, startY);
+                    if (blocker != null) {
+                        if (blocker.isFirst != attacker.isFirst) {
+                            return true; // ข้ามถ้าหมากศัตรูบัง
+                        }
+                    }
+                }
+                break;
+            // เพิ่มกรณีอื่นๆ ตามทิศทางที่ต้องการ
+        }
+        return false; // ไม่มีหมากบัง
+    }
+
+
     // เช็คตำแหน่งเมาส์
     public void handleHover(int hoveredCol, int hoveredRow) {
         hoveredTile = null;
@@ -290,16 +354,25 @@ final class Board extends JPanel {
         return null;
     }
     
-    public void addPiece() { // String pieceName, int col, int row, boolean isFirst 
+    public void addPiece(String pieceName, int col, int row, boolean isFirst ) { // 
         // piece-type(board, row, col, isFirst)
         // แก้ไม่ให้ตัวหมากทับกัน รอรับค่าจาก main, player
-        // if("dummy".equals(pieceName)) piecesList.add(new dummy(this, col, row, isFirst));
+        if("dummy".equals(pieceName)){
+            piecesList.add(new Dummy(this, col, row, isFirst));
+            Pieces p = getPieces(col, row);
+            System.out.print(p.getName()+" "+p.col+" "+p.row);
+        } //
+        if("shielder".equals(pieceName)) piecesList.add(new Shielder(this, col, row, isFirst));
+        if("gunman".equals(pieceName)) piecesList.add(new Gunman(this, col, row, isFirst));
+        if("swordsman".equals(pieceName)) piecesList.add(new Swordsman(this, col, row, isFirst));
+        if("magician".equals(pieceName)) piecesList.add(new Magician(this, col, row, isFirst));
+        if("bomber".equals(pieceName)) piecesList.add(new Bomber(this, col, row, isFirst));
+
         piecesList.add(new Shielder(this, 4, 3, true));
-        piecesList.add(new Swordsman(this, 4, 2, false));
-        piecesList.add(new Bomber(this, 5, 3, true));
-        piecesList.add(new Gunman(this, 3, 3, false));
+        piecesList.add(new Gunman(this, 4, 2, false));
+        piecesList.add(new Bomber(this, 5, 3, false));
+        piecesList.add(new Swordsman(this, 3, 3, false));
         piecesList.add(new Magician(this, 4, 4, false));
-        piecesList.add(new Dummy(this, 6, 3, true));
     }
 
     public void spawnEvent(String eventName, int c, int r){
@@ -311,7 +384,7 @@ final class Board extends JPanel {
         eventList.add(new ExtraRange(this, 4, 2));
         eventList.add(new Barrier(this, 4, 4));
         //eventList.add(new Wall(this, 6, 6));
-        
+        repaint();
     }
 
     // หมากอยู่ในช่องเพิ่มระยะหรือไม่
@@ -366,13 +439,5 @@ final class Board extends JPanel {
     
     public int getCol(){
         return col;
-    }
-
-    public int getPieceRow(){
-        return selectedPieces.row;
-    }
-
-    public int getPieceCol(){
-        return selectedPieces.col;
     }
 }

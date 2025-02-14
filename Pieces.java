@@ -7,8 +7,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class Pieces {
-    public int col, row;
-    protected int coordinate_x, coordinate_y;
+    public int col, row; // for piece
+    protected int coordinate_x, coordinate_y; // for graphic
 
     public String name;
     public int value;
@@ -25,12 +25,14 @@ public class Pieces {
     BufferedImage sheet;
     BufferedImage sprite;
 
-    public Pieces(Board board, int sumCost, int attackRange, boolean isFirst) { 
+    public Pieces(Board board, int col, int row, int sumCost, int attackRange, boolean isFirst) { 
         this.board = board;
+        this.col = col;
+        this.row = row;
         this.sumCost = sumCost;
         this.attackRange = attackRange;
         this.isFirst = isFirst;
-
+        
         try {
             sheet = ImageIO.read(getClass().getResource((isFirst == true) ? "/res/pawn.png" : "/res/pawn2.png")); // แสดงตัวหมากแต่ละฝั่ง
         } catch (IOException e) {
@@ -45,13 +47,8 @@ public class Pieces {
         }
     }
 
-    public void setCoordinate(int x, int y) {
-        this.coordinate_x = x;
-        this.coordinate_y = y;
-    }
-
-    public int[] getCoordinate() {
-        return new int[]{coordinate_x, coordinate_y};
+    public String getName(){
+        return name;
     }
 
     public void setRangeCost(int addRange) {
@@ -63,8 +60,16 @@ public class Pieces {
         return attackRangeCost;
     }
 
-    public int addPieceRange(){
+    protected int addPieceRange(){
         return addRange;
+    }
+
+    public int getCol(){
+        return col;
+    }
+
+    public int getRow(){
+        return row;
     }
 
     public ArrayList<int[]> getAttackRange() {
