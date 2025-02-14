@@ -10,13 +10,13 @@ import javax.imageio.ImageIO;
 // รอปรับแก้ไข และเรียกใช้
 class Swordsman extends Pieces {
     public Swordsman(Board board, int col, int row, boolean isFirst) {
-        super(board, 2, 1, isFirst); // board, sumCost, attackRange
+        super(board, col, row, 2, 1, isFirst); // board, sumCost, attackRange
         this.col = col;
         this.row = row;
         this.coordinate_x = col * board.tileSize;
         this.coordinate_y = row * board.tileSize;
         this.isFirst = isFirst;
-        this.name = "Swordsman";
+        this.name = "swordsman";
         
         int sheetScale = sheet.getWidth();
         int imgHeight = sheet.getHeight();
@@ -35,6 +35,11 @@ class Swordsman extends Pieces {
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g2d.drawImage(subImage.getScaledInstance(board.tileSize, board.tileSize, Image.SCALE_SMOOTH), 0, 0, null);
         g2d.dispose();
+    }
+
+    @Override
+    public String getName(){
+        return name;
     }
 
     // คำนวณระยะโจมตีได้

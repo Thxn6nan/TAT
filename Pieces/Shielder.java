@@ -6,19 +6,21 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
+import tat.Pieces;
+
 // Shielder
 // รอปรับแก้ไข และเรียกใช้
 class Shielder extends Pieces {
     private boolean invulnerable = true;
 
     public Shielder(Board board, int col, int row, boolean isFirst) {
-        super(board, 1, 1, isFirst);
+        super(board, col, row, 1, 1, isFirst);
         this.col = col;
         this.row = row;
         this.coordinate_x = col * board.tileSize;
         this.coordinate_y = row * board.tileSize;
         this.isFirst = isFirst;
-        this.name = "Shielder";
+        this.name = "shielder";
         
         int sheetScale = sheet.getWidth();
         int imgHeight = sheet.getHeight();
@@ -39,6 +41,11 @@ class Shielder extends Pieces {
         g2d.dispose();
     }
 
+    @Override
+    public String getName(){
+        return name;
+    }
+    
     // คำนวณระยะโจมตีได้
     public ArrayList<Point> getAttackTiles() {
         ArrayList<Point> tiles = new ArrayList<>();

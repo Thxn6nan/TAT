@@ -1,14 +1,15 @@
 package tat;
 
 import java.util.ArrayList;
+
+import tat.Pieces;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import javax.imageio.ImageIO;
 
 class Bomber extends Pieces {
     public Bomber(Board board, int col, int row, boolean isFirst) {
-        super(board, 6, 1, isFirst);
+        super(board, col, row, 6, 1, isFirst);
         this.col = col;
         this.row = row;
         this.coordinate_x = col * board.tileSize;
@@ -35,6 +36,11 @@ class Bomber extends Pieces {
         g2d.dispose();
     }
 
+    @Override
+    public String getName(){
+        return name;
+    }
+    
     // คำนวณระยะโจมตีได้
     public ArrayList<Point> getAttackTiles() {
         ArrayList<Point> tiles = new ArrayList<>();

@@ -6,15 +6,17 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
+import tat.Pieces;
+
 class Magician extends Pieces {
     public Magician(Board board, int col, int row, boolean isFirst) {
-        super(board, 4, 1, isFirst);
+        super(board, col, row, 4, 1, isFirst);
         this.col = col;
         this.row = row;
         this.coordinate_x = col * board.tileSize;
         this.coordinate_y = row * board.tileSize;
         this.isFirst = isFirst;
-        this.name = "Magician";
+        this.name = "magician";
 
         int sheetScale = sheet.getWidth();
         int imgHeight = sheet.getHeight();
@@ -35,6 +37,11 @@ class Magician extends Pieces {
         g2d.dispose();
     }
 
+    @Override
+    public String getName(){
+        return name;
+    }
+    
     // คำนวณระยะโจมตีได้
     public ArrayList<Point> getAttackTiles() {
         ArrayList<Point> tiles = new ArrayList<>();

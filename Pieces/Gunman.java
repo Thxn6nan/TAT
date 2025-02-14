@@ -6,15 +6,17 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
+import tat.Pieces;
+
 class Gunman extends Pieces {
     public Gunman(Board board, int col, int row, boolean isFirst) {
-        super(board, 2, 1, isFirst);
+        super(board, col, row, 2, 1, isFirst);
         this.col = col;
         this.row = row;
         this.coordinate_x = col * board.tileSize;
         this.coordinate_y = row * board.tileSize;
         this.isFirst = isFirst;
-        this.name = "Gunman";
+        this.name = "gunman";
 
         int sheetScale = sheet.getWidth();
         int imgHeight = sheet.getHeight();
@@ -35,6 +37,11 @@ class Gunman extends Pieces {
         g2d.dispose();
     }
 
+    @Override
+    public String getName(){
+        return name;
+    }
+    
     // คำนวณระยะโจมตีได้
     public ArrayList<Point> getAttackTiles() {
         ArrayList<Point> tiles = new ArrayList<>();
